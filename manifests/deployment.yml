@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: csv-parser
+  name: csv-parser
+  namespace: default
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: csv-parser
+  template:
+    metadata:
+      labels:
+        app: csv-parser
+    spec:
+      containers:
+        - image: myrkri/study_csvparser:1.4
+          imagePullPolicy: IfNotPresent
+          name: study-csvparser-1
+          env:
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: csv-db-creds
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: csv-db-creds
+          ports:
+            - containerPort: 8080

@@ -6,6 +6,7 @@ COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
 COPY src src
+COPY manifests manifests
 
 RUN ./mvnw package -DskipTests
 

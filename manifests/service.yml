@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: csv-parser-service-lb
+  labels:
+    app: csv-parser
+spec:
+  ports:
+    - port: 81
+      targetPort: 8080
+      protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: csv-parser
