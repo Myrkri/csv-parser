@@ -6,7 +6,7 @@ metadata:
   name: csv-parser
   namespace: default
 spec:
-  replicas: 5
+  replicas: 2
   selector:
     matchLabels:
       app: csv-parser
@@ -16,7 +16,7 @@ spec:
         app: csv-parser
     spec:
       containers:
-        - image: myrkri/study_csvparser:1.4
+        - image: myrkri/study_csvparser:1.6
           imagePullPolicy: IfNotPresent
           name: study-csvparser-1
           env:
@@ -32,3 +32,5 @@ spec:
                   name: csv-db-creds
           ports:
             - containerPort: 8080
+      imagePullSecrets:
+        - name: docker-reg1

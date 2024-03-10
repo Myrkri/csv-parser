@@ -1,0 +1,7 @@
+apiVesrion: v1
+kind: ConfigMap
+metadata:
+    name: parser-config
+    namespace: default
+data:
+    someKey: someValue
