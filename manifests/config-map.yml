@@ -1,7 +1,7 @@
-apiVesrion: v1
+apiVersion: v1
 kind: ConfigMap
 metadata:
     name: parser-config
     namespace: default
 data:
-    someKey: someValue
+    dbUrl: jdbc:h2:mem:testdb

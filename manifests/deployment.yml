@@ -16,7 +16,7 @@ spec:
         app: csv-parser
     spec:
       containers:
-        - image: myrkri/study_csvparser:1.6
+        - image: myrkri/study_csvparser:1.7
           imagePullPolicy: IfNotPresent
           name: study-csvparser-1
           env:
@@ -30,6 +30,11 @@ spec:
                 secretKeyRef:
                   key: password
                   name: csv-db-creds
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  key: dbUrl
+                  name: parser-config
           ports:
             - containerPort: 8080
       imagePullSecrets:

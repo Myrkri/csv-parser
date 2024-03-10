@@ -3,7 +3,7 @@ jwt:
   expiration-time: 72000000
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
+    url: ${DATABASE_URL}
     driver-class-name: org.h2.Driver
     username: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
