@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/your-repository.git'
+                git 'https://github.com/Myrkri/csv-parser.git'
             }
         }
         stage('Build') {
