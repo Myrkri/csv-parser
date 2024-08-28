@@ -1,4 +1,4 @@
-FROM amazoncorretto:19.0.2 as build
+FROM amazoncorretto:17.0.10 as build
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY manifests manifests
 
 RUN ./mvnw package -DskipTests
 
-FROM amazoncorretto:19.0.2
+FROM amazoncorretto:17.0.10
 
 COPY --from=build /app/target/*.jar app.jar
 

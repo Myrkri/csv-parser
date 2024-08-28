@@ -1,13 +1,13 @@
 pipeline {
     agent any
     tools {
-        jdk 'jdk19'
+//         jdk 'jdk19'
         maven 'Maven 3.6.3'
     }
-    environment {
-        JAVA_HOME = "${tool 'jdk19'}"
-        PATH = "${JAVA_HOME}/bin:${env.PATH}"
-    }
+//     environment {
+//         JAVA_HOME = "${tool 'jdk19'}"
+//         PATH = "${JAVA_HOME}/bin:${env.PATH}"
+//     }
     stages {
         stage('Initialization') {
 //             agent {
