@@ -2,6 +2,7 @@ pipeline {
     agent any
     tools {
         maven 'Maven 3.6.3'
+        docker 'Docker'
     }
      environment {
         DOCKERHUB_CREDENTIALS = credentials('DockerHub')
@@ -35,15 +36,18 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
+                    withDockerRegistry(credentialsId: 'DockerHub') {
+                         sh "docker build -t ${DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
+                    }
                 }
             }
         }
         stage('Push to Docker Hub') {
             steps {
                 script {
-                   sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
-                   sh "docker push ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
+                   withDockerRegistry(credentialsId: 'DockerHub') {
+                        sh "docker push ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
+                   }
                 }
             }
         }
