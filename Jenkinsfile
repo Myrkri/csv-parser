@@ -4,12 +4,12 @@ pipeline {
     stages {
         stage('Initialization') {
             tools {
-                maven 'Maven 3.6.3'
                 jdk 'jdk19'
+                maven 'Maven 3.6.3'
             }
             steps {
-                sh 'mvn -version'
                 sh 'java -version'
+                sh 'mvn -version'
             }
         }
         stage('Build') {
