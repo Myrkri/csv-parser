@@ -14,7 +14,7 @@ pipeline {
                 maven 'Maven 3.6.3'
             }
             environment {
-                JAVA_HOME = "${tool 'JDK 19'}"
+                JAVA_HOME = "${tool 'jdk19'}"
                 PATH = "${JAVA_HOME}/bin:${env.PATH}"
             }
             steps {
