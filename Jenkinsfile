@@ -1,16 +1,17 @@
 pipeline {
     agent any
-    tools {
-        maven 'Maven 3.6.3'
-        jdk 'jdk19'
-    }
 
     stages {
-//         stage('Checkout') {
-//             steps {
-//                 git 'https://github.com/Myrkri/csv-parser.git'
-//             }
-//         }
+        stage('Initialization') {
+            tools {
+                maven 'Maven 3.6.3'
+                jdk 'jdk19'
+            }
+            steps {
+                sh 'mvn -version'
+                sh 'java -version'
+            }
+        }
         stage('Build') {
             steps {
                 echo 'Building...'
