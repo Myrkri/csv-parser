@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    tools {
+        maven 'Maven 3.6.3'
+    }
 
     stages {
 //         stage('Checkout') {
@@ -9,7 +12,8 @@ pipeline {
 //         }
         stage('Build') {
             steps {
-                sh 'mvn clean install'
+                echo 'Building...'
+                sh 'mvn -DskipTests clean install'
             }
         }
         stage('Test') {
