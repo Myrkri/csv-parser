@@ -3,6 +3,10 @@ pipeline {
     tools {
         maven 'Maven 3.6.3'
     }
+     environment {
+        DOCKERHUB_CREDENTIALS = credentials('DockerHub')
+        DOCKER_IMAGE = "myrkri/study_csvparser"
+     }
 
     stages {
         stage('Initialization') {
@@ -25,6 +29,21 @@ pipeline {
             post {
                 always {
                     junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "docker build -t ${DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
+                }
+            }
+        }
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                   sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
+                   sh "docker push ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
                 }
             }
         }
