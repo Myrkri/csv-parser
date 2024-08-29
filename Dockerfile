@@ -8,7 +8,7 @@ COPY pom.xml .
 COPY src src
 COPY manifests manifests
 
-RUN apt-get update && apt-get install -y dos2unix && \
+RUN yum update -y && yum install -y dos2unix && \
     dos2unix mvnw && \
     chmod +x mvnw
 
