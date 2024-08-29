@@ -8,9 +8,9 @@ COPY pom.xml .
 COPY src src
 COPY manifests manifests
 
-RUN apt-get update && apt-get install dos2unix
-RUN dos2unix mvnw
-RUN chmod +x mvnw
+RUN apt-get update && apt-get install -y dos2unix && \
+    dos2unix mvnw && \
+    chmod +x mvnw
 
 RUN ./mvnw package -DskipTests
 
