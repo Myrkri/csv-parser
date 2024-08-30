@@ -23,15 +23,6 @@ pipeline {
                 bat 'mvn -DskipTests clean install'
             }
         }
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    withSonarQubeEnv() {
-                        bat "mvn clean verify sonar:sonar -Dsonar.projectKey=csv-parser -Dsonar.projectName='csv-parser'"
-                    }
-                }
-            }
-        }
         stage('Test') {
             steps {
                 echo 'Testing...'
@@ -41,6 +32,15 @@ pipeline {
                 always {
                     junit '**/target/surefire-reports/*.xml'
                 }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+               script {
+                    withSonarQubeEnv() {
+                        bat "mvn clean verify sonar:sonar -Dsonar.projectKey=csv-parser -Dsonar.projectName='csv-parser'"
+                    }
+               }
             }
         }
         stage('Build Docker Image') {
