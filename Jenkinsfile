@@ -23,6 +23,15 @@ pipeline {
                 bat 'mvn -DskipTests clean install'
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv() {
+                        bat "mvn clean verify sonar:sonar -Dsonar.projectKey=csv-parser -Dsonar.projectName='csv-parser'"
+                    }
+                }
+            }
+        }
         stage('Test') {
             steps {
                 echo 'Testing...'
