@@ -1,30 +1,32 @@
 pipeline {
     agent any
     tools {
+        jdk 'JAVA_HOME'
         maven 'Maven 3.6.3'
     }
      environment {
-        DOCKERHUB_CREDENTIALS = credentials('DockerHub')
         DOCKER_IMAGE = "myrkri/study_csvparser"
+        BUILD_NUMBER = "${env.BUILD_NUMBER}"
      }
 
     stages {
         stage('Initialization') {
             steps {
-                sh 'java -version'
-                sh 'mvn -version'
+                bat 'java -version'
+                bat 'mvn -version'
+                git credentialsId: 'GitHub', url: 'https://github.com/Myrkri/csv-parser.git'
             }
         }
         stage('Build') {
             steps {
                 echo 'Building...'
-                sh 'mvn -DskipTests clean install'
+                bat 'mvn -DskipTests clean install'
             }
         }
         stage('Test') {
             steps {
                 echo 'Testing...'
-                sh 'mvn test'
+                bat 'mvn test'
             }
             post {
                 always {
@@ -35,9 +37,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'DockerHub') {
-                         sh "docker build -t ${DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
-                    }
+                    bat "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} ."
                 }
             }
         }
@@ -45,7 +45,7 @@ pipeline {
             steps {
                 script {
                    withDockerRegistry(credentialsId: 'DockerHub') {
-                        sh "docker push ${DOCKER_IMAGE}:${env.BUILD_NUMBER}"
+                        bat "docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}"
                    }
                 }
             }
@@ -53,6 +53,18 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
+                script {
+                    powershell """
+                    (Get-Content ./manifests/deployment.yml) -replace 'myrkri/study_csvparser:.*', 'myrkri/study_csvparser:${BUILD_NUMBER}' | Set-Content ./manifests/deployment.yml
+                    """
+                    withKubeConfig(credentialsId: 'KubeConfig') {
+                        bat "kubectl apply -f ./manifests/docker-secret.yml"
+                        bat "kubectl apply -f ./manifests/secret.yml"
+                        bat "kubectl apply -f ./manifests/config-map.yml"
+                        bat "kubectl apply -f ./manifests/deployment.yml"
+                        bat "kubectl apply -f ./manifests/service.yml"
+                    }
+                }
             }
         }
     }
