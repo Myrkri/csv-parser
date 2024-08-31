@@ -42,7 +42,7 @@ pipeline {
             post {
                 always {
                     script {
-                        timeout(time: 10, unit: 'MINUTES') {
+                        timeout(time: 5, unit: 'MINUTES') {
                             def qg = waitForQualityGate()
                             if (qg.status != 'OK') {
                                 qg.conditions.each { condition ->
