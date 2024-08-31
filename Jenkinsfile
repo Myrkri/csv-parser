@@ -12,25 +12,22 @@ pipeline {
     stages {
         stage('Initialization') {
             steps {
-                bat 'java -version'
-                bat 'mvn -version'
-                git credentialsId: 'GitHub', url: 'https://github.com/Myrkri/csv-parser.git'
+                bat "java -version"
+                bat "mvn -version"
             }
         }
         stage('Build') {
             steps {
-                echo 'Building...'
-                bat 'mvn -DskipTests clean install'
+                bat "mvn -DskipTests clean install"
             }
         }
         stage('Test') {
             steps {
-                echo 'Testing...'
-                bat 'mvn test'
+                bat "mvn test"
             }
             post {
                 always {
-                    junit '**/target/surefire-reports/*.xml'
+                    junit "**/target/surefire-reports/*.xml"
                 }
             }
         }
@@ -41,6 +38,25 @@ pipeline {
                         bat "mvn clean verify sonar:sonar -Dsonar.projectKey=csv-parser -Dsonar.projectName='csv-parser'"
                     }
                }
+            }
+            post {
+                always {
+                    script {
+                        timeout(time: 10, unit: 'MINUTES') {
+                            def qg = waitForQualityGate()
+                            if (qg.status != 'OK') {
+                                qg.conditions.each { condition ->
+                                    if (condition.status != 'OK') {
+                                        echo "Failed conditions: ${condition.metricKey} - ${condition.actualValue} ${condition.comparator} ${condition.errorThreshold}"
+                                    }
+                                }
+                                error "Failed to pass SonarQube Quality Gate"
+                            } else {
+                                echo "Successfully passed SonarQube Quality Gate"
+                            }
+                        }
+                    }
+                }
             }
         }
         stage('Build Docker Image') {
@@ -61,7 +77,6 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                echo 'Deploying...'
                 script {
                     powershell """
                     (Get-Content ./manifests/deployment.yml) -replace 'myrkri/study_csvparser:.*', 'myrkri/study_csvparser:${BUILD_NUMBER}' | Set-Content ./manifests/deployment.yml
