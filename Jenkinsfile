@@ -45,11 +45,6 @@ pipeline {
                         timeout(time: 5, unit: 'MINUTES') {
                             def qg = waitForQualityGate()
                             if (qg.status != 'OK') {
-                                qg.conditions.each { condition ->
-                                    if (condition.status != 'OK') {
-                                        echo "Failed conditions: ${condition.metricKey} - ${condition.actualValue} ${condition.comparator} ${condition.errorThreshold}"
-                                    }
-                                }
                                 error "Failed to pass SonarQube Quality Gate"
                             } else {
                                 echo "Successfully passed SonarQube Quality Gate"
