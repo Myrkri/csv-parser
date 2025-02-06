@@ -1,13 +1,13 @@
 package com.example.csv.service;
 
-import com.example.csv.model.CsvRecord;
+import com.example.csv.model.enums.ProcessingStatus;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.util.Map;
 
 
 public interface FileUpload {
 
-    List<CsvRecord> upload(MultipartFile file);
+    Map<String, ProcessingStatus> upload(MultipartFile file);
 
 }
