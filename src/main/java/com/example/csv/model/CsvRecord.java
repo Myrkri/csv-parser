@@ -7,7 +7,7 @@ import com.github.mygreen.supercsv.annotation.constraint.CsvNumberMax;
 import lombok.Data;
 
 @CsvBean(header = true)
-@CsvPartial(columnSize = 4)
+@CsvPartial(columnSize = 3)
 @Data
 public class CsvRecord {
 
