@@ -4,6 +4,7 @@ import com.example.csv.model.CsvRecord;
 import com.example.csv.model.enums.ProcessingStatus;
 import com.example.csv.repository.entity.StatusStorageEntity;
 import com.example.csv.service.StatusStorageService;
+import com.example.csv.service.StatusUpdateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -24,6 +25,7 @@ public class CsvRecordConsumer {
 
     private final StatusStorageService statusStorageService;
     private final KafkaTemplate<String, CsvRecord> kafkaTemplate;
+    private final StatusUpdateService statusUpdateService;
 
     @KafkaListener(topics = "${kafka.topic.name}", groupId = "csv-readers")
     public void consumeRecord(ConsumerRecord<String, CsvRecord> csvRecord) {
@@ -51,14 +53,21 @@ public class CsvRecordConsumer {
 
     @KafkaListener(topics = "csv-updates", groupId = "csv-updaters")
     public void updateRecord(ConsumerRecord<String, CsvRecord> csvRecord) {
-        log.info("Update in progress...");
+        log.info("Processing CSV record...");
         final String uuid = getUUId(csvRecord);
+
+        // Проверяем, это конец файла или нет
         final String fileEndHeader = Objects.isNull(csvRecord.headers().lastHeader("file-end")) ?
                 ""
                 :
                 new String(csvRecord.headers().lastHeader("file-end").value(), StandardCharsets.UTF_8);
         final boolean isEndOfFile = Objects.equals(fileEndHeader, "true");
+
+        // Обновляем статус в БД
         statusStorageService.incrementProcessingStatus(uuid, isEndOfFile);
+
+        // Отправляем обработанную запись клиенту
+        statusUpdateService.sendUpdate(uuid, csvRecord.value(), isEndOfFile);
     }
 
     private static String getUUId(ConsumerRecord<String, CsvRecord> csvRecord) {

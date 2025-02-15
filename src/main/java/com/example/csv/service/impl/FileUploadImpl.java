@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Log4j2
@@ -33,6 +34,20 @@ public class FileUploadImpl implements FileUpload {
     public Map<String, ProcessingStatus> upload(final MultipartFile file) {
         final String uuid = UUID.randomUUID().toString();
 
+        parseToKafka(file, uuid);
+        return Map.of(uuid, ProcessingStatus.COMPLETED);
+    }
+
+    @Override
+    public String uploadAsync(final MultipartFile file) {
+        final String uuid = UUID.randomUUID().toString();
+
+        CompletableFuture.runAsync(() -> parseToKafka(file, uuid));
+
+        return uuid;
+    }
+
+    private void parseToKafka(MultipartFile file, String uuid) {
         try (LazyCsvAnnotationBeanReader<CsvRecord> csvReader = new LazyCsvAnnotationBeanReader<>(
                 CsvRecord.class,
                 new InputStreamReader(file.getInputStream()), CsvPreference.STANDARD_PREFERENCE)) {
@@ -56,6 +71,6 @@ public class FileUploadImpl implements FileUpload {
         } catch (IOException e) {
             log.error("Failed to read file", e);
         }
-        return Map.of(uuid, ProcessingStatus.COMPLETED);
     }
+
 }

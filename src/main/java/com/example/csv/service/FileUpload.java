@@ -10,4 +10,5 @@ public interface FileUpload {
 
     Map<String, ProcessingStatus> upload(MultipartFile file);
 
+    String uploadAsync(final MultipartFile file);
 }
