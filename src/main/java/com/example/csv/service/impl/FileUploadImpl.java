@@ -16,7 +16,8 @@ import org.supercsv.prefs.CsvPreference;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @Log4j2
@@ -44,9 +45,17 @@ public class FileUploadImpl implements FileUpload {
                                 .setHeader("uuid", uuid)
                                 .build());
             }
+            kafkaTemplate.send(
+                    MessageBuilder
+                            .withPayload(new CsvRecord())
+                            .setHeader(KafkaHeaders.TOPIC, topic)
+                            .setHeader("uuid", uuid)
+                            .setHeader("file-end", "true")
+                            .build());
+
         } catch (IOException e) {
             log.error("Failed to read file", e);
         }
-        return Map.of(uuid, ProcessingStatus.PROCESSING);
+        return Map.of(uuid, ProcessingStatus.COMPLETED);
     }
 }

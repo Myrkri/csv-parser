@@ -27,10 +27,26 @@ public class StatusStorageServiceImpl implements StatusStorageService {
     }
 
     @Override
-    public void incrementProcessingStatus(final String id) {
-        final Optional<StatusStorageEntity> entity = statusStorageRepository.findByProcessId(id);
-        entity.ifPresent(statusStorageEntity -> statusStorageEntity.setProcessedRecords(statusStorageEntity.getProcessedRecords() + 1));
-        entity.ifPresent(statusStorageRepository::saveAndFlush);
+    public void incrementProcessingStatus(final String id, boolean isEndOfFile) {
+        final Optional<StatusStorageEntity> optEntity = statusStorageRepository.findByProcessId(id);
+        if(optEntity.isEmpty()) {
+            log.error("No records found with this ID");
+        }
+        if (optEntity.isPresent()) {
+            final StatusStorageEntity entity = optEntity.get();
+            if (isEndOfFile) {
+                entity.setStatus(ProcessingStatus.COMPLETED);
+            } else {
+                entity.setStatus(ProcessingStatus.PROCESSING);
+                entity.setProcessedRecords(entity.getProcessedRecords() + 1);
+            }
+            statusStorageRepository.saveAndFlush(entity);
+        }
     }
 
+    @Override
+    public void create(StatusStorageEntity entity) {
+        log.info("Creating an entry in DB");
+        statusStorageRepository.saveAndFlush(entity);
+    }
 }
